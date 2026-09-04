@@ -17,8 +17,8 @@ Status: **In progress**
 - [x] Add early roadmap
 - [x] Choose browser-first Three.js + Vite stack
 - [x] Replace Unity-specific repository rules
-- [ ] Create minimal browser runtime
-- [ ] Add automated build verification
+- [x] Create minimal browser runtime
+- [x] Add automated build verification
 - [ ] Confirm mobile/desktop production build
 
 Exit condition: the repository builds into a small browser game that starts reliably without Unity or another editor.
