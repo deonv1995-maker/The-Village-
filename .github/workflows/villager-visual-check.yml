@@ -5,10 +5,11 @@ on:
     branches: [chore/villager-visual-check]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   preview:
+    if: ${{ !contains(github.event.head_commit.message, '[art-polish-applied]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -56,3 +57,15 @@ jobs:
           path: villager-preview.png
           if-no-files-found: error
           retention-days: 3
+
+      - name: Commit verified art polish to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/villagerAppearanceCatalog.js src/rendering/villagers/VillagerAssetFactory.js
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "Apply verified villager art polish [art-polish-applied]"
+          git push
