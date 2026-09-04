@@ -14,9 +14,9 @@ shell.innerHTML = `
   <div class="hud">
     <div class="hud__title">
       <strong>The Village</strong>
-      <span>Foundation 0.1 — browser runtime</span>
+      <span>Foundation 0.2 — villager selection</span>
     </div>
-    <div class="hud__hint">Drag to pan · wheel or pinch to zoom</div>
+    <div class="hud__hint">Tap a villager to select · long-press or Ctrl/Shift-tap to add/remove · tap ground to clear · drag to pan · pinch/wheel to zoom</div>
   </div>
 `;
 root.append(shell);
