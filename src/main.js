@@ -14,9 +14,9 @@ shell.innerHTML = `
   <div class="hud">
     <div class="hud__title">
       <strong>The Village</strong>
-      <span>Foundation 0.2 — villager selection</span>
+      <span>Foundation 0.3 — movement commands</span>
     </div>
-    <div class="hud__hint">Tap a villager to select · long-press or Ctrl/Shift-tap to add/remove · tap ground to clear · drag to pan · pinch/wheel to zoom</div>
+    <div class="hud__hint">Tap a villager to select · tap ground to move · long-press villager to multi-select · long-press ground or Esc to clear · drag to pan · pinch/wheel to zoom</div>
   </div>
 `;
 root.append(shell);

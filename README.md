@@ -25,11 +25,13 @@ The architecture must scale from a small starting group into a substantial settl
 
 ## Current Stage
 
-**Foundation 0.2 — villager selection.**
+**Foundation 0.3 — movement commands.**
 
-The browser test world now has the settlement camera, six modular articulated villagers, authoritative selection state, mouse/touch hit testing, deselection, multi-selection, and rendering-only selection feedback.
+The browser test world now has the settlement camera, six modular articulated villagers, authoritative selection state, touch/mouse selection, direct move commands, authoritative world bounds, and a separate navigation execution boundary.
 
-The next gameplay milestone is movement commands while preserving the architectural path from player intent into shared command/job/task execution.
+Selected villagers can be ordered to valid ground. Multi-selected villagers preserve their current formation offsets rather than collapsing onto one point, and rendering follows authoritative villager position/state.
+
+The next gameplay milestone is the reusable job/task foundation so direct commands and future autonomous work share one execution lifecycle.
 
 ## Project Documentation
 
@@ -37,6 +39,7 @@ The next gameplay milestone is movement commands while preserving the architectu
 - `Docs/ARCHITECTURE.md` — authoritative technical boundaries and early system ownership.
 - `Docs/ROADMAP.md` — staged development order toward the first playable vertical slice.
 - `Docs/VILLAGER_CHARACTER_SYSTEM.md` — shared rig, modular appearance, animation, and villager asset ownership.
+- `Docs/MOVEMENT_COMMAND_SYSTEM.md` — move-command ownership, input arbitration, navigation boundary, and Phase 5 upgrade path.
 
 ## Immediate Milestone
 
