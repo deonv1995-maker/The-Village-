@@ -1,20 +1,33 @@
 # The Village
 
-**The Village** is a settlement-management / RTS / colony-simulation game where the player directs multiple persistent villagers rather than controlling one main character.
+**The Village** is a mobile-first 3D settlement-management / RTS / colony-simulation game where the player directs multiple persistent villagers rather than controlling one main character.
 
-The player will be able to issue direct commands to selected villagers while also allowing villagers to perform autonomous work through shared job and task systems.
+This project is separate from **The Villager** and **Beyond 2000**. It has its own repository, architecture, gameplay rules, assets, and design history.
+
+## Development model
+
+The Village is built directly in this repository as a browser game. The user does not need to work in Unity or another editor for normal development.
+
+The technical foundation mirrors the proven workflow used by The Villager Rebuild:
+
+- Three.js as the 3D runtime
+- Vite for development and production builds
+- ES modules with clear system boundaries
+- GitHub as the source of truth
+- browser/mobile testing from generated builds
+- automated build checks before stable changes are considered safe
 
 ## Core Development Principle
 
-The game is built as a collection of reusable interacting systems. NPCs execute shared jobs and tasks rather than owning separate implementations of gathering, hauling, construction, farming, hunting, crafting, storage, or other world activities.
+The game is built as a collection of reusable interacting systems. Villagers execute shared jobs and tasks rather than owning separate implementations of gathering, hauling, construction, farming, hunting, crafting, storage, or other world activities.
 
-The architecture must be able to scale from a small starting group into a substantial settlement without rewriting the core systems.
+The architecture must scale from a small starting group into a substantial settlement without rewriting the core systems.
 
 ## Current Stage
 
-Repository foundation and project architecture definition.
+**Foundation 0.1 — browser runtime and project structure.**
 
-No Unity project files have been committed yet.
+The immediate target is a small playable test world with a settlement camera and multiple placeholder villagers. From there the project will add selection, commands, movement, shared jobs, resources, hauling, storage, and construction in that order.
 
 ## Project Documentation
 
