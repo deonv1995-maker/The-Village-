@@ -51,12 +51,12 @@ Exit condition: multiple independent villagers exist with clean state ownership 
 
 ## Phase 3 — Selection
 
-- [ ] Single villager selection
-- [ ] Deselection
-- [ ] Multi-selection
-- [ ] Clear visual selection feedback
-- [ ] Selection state owned outside UI/rendering presentation
-- [ ] Mobile-friendly touch behavior
+- [x] Single villager selection
+- [x] Deselection
+- [x] Multi-selection
+- [x] Clear visual selection feedback
+- [x] Selection state owned outside UI/rendering presentation
+- [x] Mobile-friendly touch behavior
 
 Exit condition: the player can reliably select the intended villager or group.
 

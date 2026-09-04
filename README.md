@@ -25,15 +25,18 @@ The architecture must scale from a small starting group into a substantial settl
 
 ## Current Stage
 
-**Foundation 0.1 — browser runtime and project structure.**
+**Foundation 0.2 — villager selection.**
 
-The immediate target is a small playable test world with a settlement camera and multiple placeholder villagers. From there the project will add selection, commands, movement, shared jobs, resources, hauling, storage, and construction in that order.
+The browser test world now has the settlement camera, six modular articulated villagers, authoritative selection state, mouse/touch hit testing, deselection, multi-selection, and rendering-only selection feedback.
+
+The next gameplay milestone is movement commands while preserving the architectural path from player intent into shared command/job/task execution.
 
 ## Project Documentation
 
 - `Docs/PROJECT_VISION.md` — game identity, player fantasy, control model, and design pillars.
 - `Docs/ARCHITECTURE.md` — authoritative technical boundaries and early system ownership.
 - `Docs/ROADMAP.md` — staged development order toward the first playable vertical slice.
+- `Docs/VILLAGER_CHARACTER_SYSTEM.md` — shared rig, modular appearance, animation, and villager asset ownership.
 
 ## Immediate Milestone
 
