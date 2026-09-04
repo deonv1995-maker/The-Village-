@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 
-const WORLD_SIZE = 90;
-
 export class WorldScene {
-  constructor({ container }) {
+  constructor({ container, world }) {
+    if (!world) throw new Error('WorldScene requires authoritative world state.');
+
     this.container = container;
+    this.world = world;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xb8d6dd);
-    this.cameraTarget = new THREE.Vector3(0, 0, 0);
+    this.cameraTarget = new THREE.Vector3(0, world.groundY, 0);
 
     this.camera = new THREE.PerspectiveCamera(48, 1, 0.1, 300);
     this.camera.position.set(18, 26, 22);
@@ -34,15 +35,16 @@ export class WorldScene {
 
   addGround() {
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(WORLD_SIZE, WORLD_SIZE),
+      new THREE.PlaneGeometry(this.world.size, this.world.size),
       new THREE.MeshStandardMaterial({ color: 0x789a55, roughness: 1 })
     );
     ground.rotation.x = -Math.PI / 2;
+    ground.position.y = this.world.groundY;
     ground.name = 'world-ground';
     this.scene.add(ground);
 
-    const grid = new THREE.GridHelper(WORLD_SIZE, 30, 0x50663f, 0x6f874f);
-    grid.position.y = 0.015;
+    const grid = new THREE.GridHelper(this.world.size, 30, 0x50663f, 0x6f874f);
+    grid.position.y = this.world.groundY + 0.015;
     grid.material.transparent = true;
     grid.material.opacity = 0.28;
     this.scene.add(grid);
@@ -59,11 +61,11 @@ export class WorldScene {
 
     for (const [x, z] of positions) {
       const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-      trunk.position.set(x, 1.7, z);
+      trunk.position.set(x, this.world.groundY + 1.7, z);
       this.scene.add(trunk);
 
       const crown = new THREE.Mesh(crownGeometry, crownMaterial);
-      crown.position.set(x, 5.15, z);
+      crown.position.set(x, this.world.groundY + 5.15, z);
       this.scene.add(crown);
     }
   }
