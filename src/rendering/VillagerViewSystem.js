@@ -22,6 +22,7 @@ export class VillagerViewSystem {
       const model = this.assetFactory.create(villager.appearance);
       const root = model.root;
       root.position.set(villager.position.x, villager.position.y, villager.position.z);
+      root.rotation.y = villager.heading ?? 0;
       root.userData.villagerId = villager.id;
 
       const marker = new THREE.Mesh(this.markerGeometry, this.markerMaterial);
@@ -72,6 +73,12 @@ export class VillagerViewSystem {
 
   update(deltaSeconds) {
     for (const view of this.views.values()) {
+      view.root.position.set(
+        view.villager.position.x,
+        view.villager.position.y,
+        view.villager.position.z
+      );
+      view.root.rotation.y = view.villager.heading ?? view.root.rotation.y;
       view.model.setAnimation(view.villager.state === 'moving' ? 'walk' : 'idle');
       view.model.update(deltaSeconds);
     }
