@@ -62,13 +62,13 @@ Exit condition: the player can reliably select the intended villager or group.
 
 ## Phase 4 — Movement Commands
 
-- [ ] Define command API
-- [ ] Issue move order to selected villager(s)
-- [ ] Add navigation/destination request boundary
-- [ ] Execute movement
-- [ ] Detect arrival/completion
-- [ ] Handle invalid destinations safely
-- [ ] Avoid unnecessary path recomputation
+- [x] Define command API
+- [x] Issue move order to selected villager(s)
+- [x] Add navigation/destination request boundary
+- [x] Execute movement
+- [x] Detect arrival/completion
+- [x] Handle invalid destinations safely
+- [x] Avoid unnecessary path recomputation
 
 Exit condition: selected villagers can be ordered to a destination and reliably complete the move command.
 
