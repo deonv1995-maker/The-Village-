@@ -4,54 +4,56 @@
 
 Reach a small but reliable playable vertical slice before expanding into deeper settlement simulation.
 
-The first proof of the game is not a large content set. It is a trustworthy loop where the player can direct multiple villagers and the shared systems execute that work correctly.
+The first proof is a trustworthy loop where the player can direct multiple villagers and shared systems execute that work correctly.
 
-## Phase 0 — Repository and Project Foundation
+## Phase 0 — Repository and Browser Foundation
 
 Status: **In progress**
 
 - [x] Create repository
 - [x] Define project identity and development rules
 - [x] Add project vision
-- [x] Add initial architecture document
+- [x] Add architecture document
 - [x] Add early roadmap
-- [ ] Create Unity project and commit project files
-- [x] Add Unity-appropriate `.gitignore`
-- [ ] Confirm target Unity version and platform settings
-- [ ] Establish initial scene and folder structure
+- [x] Choose browser-first Three.js + Vite stack
+- [x] Replace Unity-specific repository rules
+- [ ] Create minimal browser runtime
+- [ ] Add automated build verification
+- [ ] Confirm mobile/desktop production build
 
-Exit condition: the repository contains a clean Unity project that opens successfully and can be built/run as a minimal empty test application.
+Exit condition: the repository builds into a small browser game that starts reliably without Unity or another editor.
 
 ## Phase 1 — Playable Test World
 
-- [ ] Create a simple test scene
-- [ ] Establish ground/world representation
-- [ ] Add camera movement
+- [ ] Create a simple 3D test world
+- [ ] Establish authoritative ground/world representation
+- [ ] Add settlement camera pan
 - [ ] Add zoom
-- [ ] Validate mobile-friendly camera input approach
+- [ ] Validate touch and mouse input
+- [ ] Keep rendering separate from world state
 
-Exit condition: the player can reliably inspect the playable test area.
+Exit condition: the player can reliably inspect the playable test area on desktop and mobile.
 
 ## Phase 2 — Villager Representation
 
-- [ ] Create minimal villager runtime component
-- [ ] Give villagers stable runtime identity
-- [ ] Create one villager prefab
-- [ ] Spawn/place multiple villagers in the test scene
-- [ ] Keep presentation separate from villager state
+- [ ] Create minimal villager state model
+- [ ] Give villagers stable IDs
+- [ ] Create separate villager rendering representation
+- [ ] Place multiple villagers in the test world
+- [ ] Keep gameplay state independent of Three.js meshes
 
 Do not add full needs, relationships, aging, combat, or occupations yet.
 
-Exit condition: multiple independent villagers exist with clean identity/state ownership.
+Exit condition: multiple independent villagers exist with clean state ownership and separate presentation.
 
 ## Phase 3 — Selection
 
 - [ ] Single villager selection
 - [ ] Deselection
 - [ ] Multi-selection
-- [ ] Clear selection feedback
-- [ ] Selection state owned outside UI presentation
-- [ ] Mobile-friendly touch selection behavior
+- [ ] Clear visual selection feedback
+- [ ] Selection state owned outside UI/rendering presentation
+- [ ] Mobile-friendly touch behavior
 
 Exit condition: the player can reliably select the intended villager or group.
 
@@ -71,18 +73,18 @@ Exit condition: selected villagers can be ordered to a destination and reliably 
 
 - [ ] Define minimal job lifecycle
 - [ ] Define task execution contract/state
-- [ ] Route direct commands through the shared execution path where appropriate
+- [ ] Route direct commands through shared execution
 - [ ] Add cancellation/failure handling
 - [ ] Add minimal reservation service
 - [ ] Verify cleanup on interruption
 
-Exit condition: villager work is no longer ad-hoc command logic; it flows through a reusable job/task foundation.
+Exit condition: villager work flows through reusable jobs/tasks rather than ad-hoc command logic.
 
 ## Phase 6 — Resources and Gathering
 
 - [ ] Create resource definition data
-- [ ] Create runtime resource node
-- [ ] Add resource quantity/depletion state
+- [ ] Create runtime resource nodes
+- [ ] Add quantity/depletion state
 - [ ] Add gather job
 - [ ] Reserve gather target
 - [ ] Navigate to target
@@ -90,7 +92,7 @@ Exit condition: villager work is no longer ad-hoc command logic; it flows throug
 - [ ] Produce authoritative item/inventory state
 - [ ] Release reservation correctly
 
-Exit condition: the player can order a villager to gather a resource and the resource/item state updates correctly.
+Exit condition: the player can order a villager to gather a resource and the state updates correctly.
 
 ## Phase 7 — Carrying and Inventory
 
@@ -98,42 +100,42 @@ Exit condition: the player can order a villager to gather a resource and the res
 - [ ] Implement one authoritative inventory representation
 - [ ] Add villager carrying capacity/state
 - [ ] Connect gathering output to inventory
-- [ ] Add simple visual feedback if useful
+- [ ] Add presentation feedback where useful
 
 Exit condition: gathered resources are represented consistently as items carried by villagers.
 
 ## Phase 8 — Storage and Hauling
 
-- [ ] Create storage component
+- [ ] Create storage state/component
 - [ ] Define capacity and acceptance rules
-- [ ] Add reservable storage capacity/destination
+- [ ] Add reservable storage destination/capacity
 - [ ] Add haul/deliver job
 - [ ] Deposit items into storage
 - [ ] Handle full/invalid storage safely
 
-Exit condition: villagers can gather/carry resources and deliver them to shared storage without conflicting claims.
+Exit condition: villagers can carry and deliver resources to shared storage without conflicting claims.
 
 ## Phase 9 — Basic Building Placement
 
 - [ ] Create building definition data
 - [ ] Add placement preview
 - [ ] Add placement validation
-- [ ] Create construction-site runtime state
+- [ ] Create construction-site state
 - [ ] Define resource requirements
 
 Exit condition: the player can place a valid construction site with authoritative requirements.
 
-## Phase 10 — NPC Construction
+## Phase 10 — Villager Construction
 
 - [ ] Create material delivery tasks
 - [ ] Reserve required construction resources
 - [ ] Deliver resources
 - [ ] Perform construction work
 - [ ] Track construction progress
-- [ ] Transition construction site to completed building
-- [ ] Release all reservations safely
+- [ ] Transition site to completed building
+- [ ] Release reservations safely
 
-Exit condition: villagers can build a placed structure using gathered/stored resources through the shared job system.
+Exit condition: villagers can build a placed structure through the shared job system.
 
 ## Phase 11 — Autonomous Work
 
@@ -143,9 +145,9 @@ Only begin once direct commands and jobs are reliable.
 - [ ] Add priority and eligibility rules
 - [ ] Respect reservations
 - [ ] Respect direct-command overrides
-- [ ] Avoid per-frame decision polling
+- [ ] Avoid per-frame AI decision polling
 
-Exit condition: villagers can perform routine available work without constant player orders while still responding predictably to direct commands.
+Exit condition: villagers can perform routine work without constant player orders while remaining predictable under direct commands.
 
 ## Phase 12 — Save / Load Foundation
 
@@ -155,11 +157,11 @@ Exit condition: villagers can perform routine available work without constant pl
 - [ ] Define storage/inventory persistence
 - [ ] Define construction/building persistence
 - [ ] Save minimal test settlement
-- [ ] Load it back without runtime-reference coupling
+- [ ] Reload it without Three.js/DOM reference coupling
 
-Exit condition: the current vertical slice can persist and restore correctly.
+Exit condition: the vertical slice can persist and restore correctly.
 
-## First Vertical Slice Definition
+## First Vertical Slice
 
 The first meaningful playable slice is complete when the player can:
 
@@ -175,18 +177,6 @@ The first meaningful playable slice is complete when the player can:
 
 ## Explicitly Deferred
 
-Until the core loop above is stable, defer:
-
-- complex combat
-- diplomacy
-- large technology trees
-- generations/families
-- advanced villager needs
-- complex economy/trade
-- weather/seasons
-- large production chains
-- advanced farming
-- large animal ecosystems
-- multiplayer
+Until that loop is stable, defer complex combat, diplomacy, large technology trees, generations/families, advanced needs, complex trade/economy, weather/seasons, large production chains, advanced farming, large animal ecosystems, and multiplayer.
 
 These systems may become important later, but none should force a rewrite of the core command/job/movement/interaction architecture.
