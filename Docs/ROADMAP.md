@@ -16,7 +16,7 @@ Status: **In progress**
 - [x] Add initial architecture document
 - [x] Add early roadmap
 - [ ] Create Unity project and commit project files
-- [ ] Add Unity-appropriate `.gitignore`
+- [x] Add Unity-appropriate `.gitignore`
 - [ ] Confirm target Unity version and platform settings
 - [ ] Establish initial scene and folder structure
 
