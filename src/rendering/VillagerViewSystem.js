@@ -1,45 +1,55 @@
 import * as THREE from 'three';
+import { VillagerAssetFactory } from './villagers/VillagerAssetFactory.js';
 
 export class VillagerViewSystem {
   constructor({ scene, villagers }) {
     this.scene = scene;
     this.views = new Map();
-
-    const bodyGeometry = new THREE.CapsuleGeometry(0.42, 0.85, 5, 8);
-    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xd6b06f, roughness: 0.9 });
-    const markerGeometry = new THREE.RingGeometry(0.58, 0.72, 24);
-    const markerMaterial = new THREE.MeshBasicMaterial({
+    this.assetFactory = new VillagerAssetFactory();
+    this.markerGeometry = new THREE.RingGeometry(0.38, 0.48, 24);
+    this.markerMaterial = new THREE.MeshBasicMaterial({
       color: 0xe9f0d0,
       transparent: true,
-      opacity: 0.55,
-      side: THREE.DoubleSide
+      opacity: 0.50,
+      side: THREE.DoubleSide,
+      depthWrite: false
     });
 
-    for (const villager of villagers) {
-      const root = new THREE.Group();
+    villagers.forEach((villager, index) => {
+      const model = this.assetFactory.create(villager.appearance);
+      const root = model.root;
       root.position.set(villager.position.x, villager.position.y, villager.position.z);
       root.userData.villagerId = villager.id;
 
-      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-      body.position.y = 0.85;
-      root.add(body);
-
-      const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+      const marker = new THREE.Mesh(this.markerGeometry, this.markerMaterial);
       marker.rotation.x = -Math.PI / 2;
-      marker.position.y = 0.02;
+      marker.position.y = 0.012;
+      marker.scale.setScalar(Math.max(0.72, Math.min(1, root.userData.height / 1.7)));
       root.add(marker);
 
+      // Desynchronize idle loops without introducing non-deterministic appearance state.
+      model.update(index * 0.31);
+
       this.scene.add(root);
-      this.views.set(villager.id, root);
+      this.views.set(villager.id, { root, model, villager });
+    });
+  }
+
+  update(deltaSeconds) {
+    for (const view of this.views.values()) {
+      view.model.setAnimation(view.villager.state === 'moving' ? 'walk' : 'idle');
+      view.model.update(deltaSeconds);
     }
   }
 
-  update() {}
-
   dispose() {
-    for (const root of this.views.values()) {
-      this.scene.remove(root);
+    for (const view of this.views.values()) {
+      this.scene.remove(view.root);
+      view.model.dispose();
     }
     this.views.clear();
+    this.markerGeometry.dispose();
+    this.markerMaterial.dispose();
+    this.assetFactory.dispose();
   }
 }
