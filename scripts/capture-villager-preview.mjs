@@ -9,22 +9,24 @@ const browser = await chromium.launch({
 
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
-  const errors = [];
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(`console: ${message.text()}`);
-  });
-  page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
 
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
   await page.waitForSelector('canvas');
+
+  const bootError = await page.locator('.boot-error').count();
+  if (bootError > 0) {
+    throw new Error('The Village rendered its boot-error fallback instead of the game.');
+  }
+
   await page.mouse.move(720, 500);
   await page.mouse.wheel(0, -3200);
   await page.waitForTimeout(1200);
   await page.screenshot({ path: 'villager-preview.png', fullPage: true });
 
-  if (errors.length > 0) {
-    console.error(errors.join('\n'));
-    process.exitCode = 1;
+  if (pageErrors.length > 0) {
+    throw new Error(`Page errors:\n${pageErrors.join('\n')}`);
   }
 } finally {
   await browser.close();
