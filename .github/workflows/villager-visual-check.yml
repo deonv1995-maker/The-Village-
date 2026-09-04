@@ -1,0 +1,55 @@
+name: Villager visual check
+
+on:
+  push:
+    branches: [chore/villager-visual-check]
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install project dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install preview driver
+        run: npm install --no-save --no-audit --no-fund playwright-core
+
+      - name: Build game
+        run: npm run check
+
+      - name: Start preview server
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/village-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/village-preview.log
+          exit 1
+
+      - name: Capture rendered villager lineup
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: node scripts/capture-villager-preview.mjs
+
+      - name: Upload visual preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: villager-visual-preview
+          path: villager-preview.png
+          if-no-files-found: error
+          retention-days: 3
