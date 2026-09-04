@@ -1,263 +1,180 @@
-# The Village — Initial Architecture
+# The Village — Technical Architecture
 
 ## Purpose
 
-This document defines the early architectural boundaries for The Village. It should evolve with the project, but changes to these ownership rules should be deliberate and documented.
+The Village is a mobile-first browser game built directly in this repository. Normal development does not depend on Unity or another visual editor.
 
-The immediate goal is not to build every future system. It is to establish a clean foundation for the first reliable gameplay loop:
+The initial stack is intentionally close to The Villager Rebuild where that workflow is already proven:
+
+- Three.js for 3D rendering
+- Vite for development and production builds
+- ES modules
+- GitHub as source of truth
+- generated browser builds for mobile/desktop testing
+- automated build verification
+
+The first architectural proof is:
 
 **selection → command → job/task → movement → interaction → completion**
 
-## Architectural Principles
+## Core Rules
 
 1. One authoritative owner for each category of gameplay state.
-2. Shared systems provide world behavior; NPCs execute through those systems.
-3. Direct commands and autonomous work share the same execution path.
+2. Shared systems provide world behavior; villagers execute through those systems.
+3. Direct commands and autonomous work share the same job/task execution path.
 4. UI displays state and sends commands; it does not own gameplay state.
-5. Content should be data-driven where that removes hard-coded duplication.
-6. Persistent data must remain separable from Unity runtime object references.
-7. Systems that scale with villager count must avoid unnecessary per-frame work.
+5. Content definitions stay data-driven where practical.
+6. Persistent data uses stable IDs and serializable values, not live Three.js objects.
+7. Villager-scaled systems avoid unnecessary per-frame work.
+8. Rendering objects are presentation, never the source of truth for simulation state.
 
-## Initial Runtime Layers
+## Runtime Layers
 
-### Presentation Layer
+### Core
+Owns application lifecycle, game loop/timing, events, system startup/shutdown, and shared runtime coordination.
 
-Responsible for:
+### Rendering
+Owns the Three.js scene, renderer, cameras, lighting, visual instances, effects, LOD/culling, and world presentation. Rendering consumes authoritative state but does not define gameplay rules.
 
-- camera
-- input
-- selection visuals
-- command UI
-- villager panels
-- world-space feedback
+### Input / Camera
+Owns pointer/touch interpretation and camera controls. Input converts player gestures into selection or command requests; it should not mutate gameplay state directly.
 
-This layer may request gameplay actions but must not own authoritative job, inventory, resource, or construction state.
+### Selection / Command
+Selection tracks which villagers or valid targets are selected. Commands translate player intent into gameplay requests such as move, gather, build, haul, or attack.
 
-### Command Layer
+Direct orders should use the same underlying execution systems later used by autonomous work.
 
-Responsible for translating player intent into gameplay requests.
+### Villagers
+Each villager owns its individual data and current execution context, for example:
 
-Examples:
-
-- move selected villagers
-- gather selected resource
-- construct selected building
-- attack selected target
-
-Commands should produce or prioritize work through the same job/task infrastructure used by autonomous villagers.
-
-### NPC Layer
-
-Each villager owns only its individual runtime state and execution context.
-
-Possible responsibilities:
-
-- stable identity
-- current state
-- current job/task reference
-- skills/role data
-- needs data
+- stable ID
+- identity/display data
+- world position/heading
+- role/skills/traits
+- needs/health when introduced
 - carried inventory/equipment
-- movement agent reference
+- current job/task reference
 
-The NPC must not independently implement every activity in the game.
+A villager must not contain separate implementations of gathering, construction, hauling, farming, hunting, crafting, and storage.
 
-### Job System
+### Jobs / Tasks
+The job system owns available work, assignment, priority, lifecycle, cancellation, completion, and failure.
 
-Authoritative owner of available work and work assignment rules.
+Tasks are executable steps within a job. Example gather flow:
 
-Responsibilities may include:
-
-- creating jobs
-- tracking job lifecycle
-- priority
-- eligibility
-- assignment
-- cancellation
-- completion
-- failure handling
-
-A job describes the desired outcome. It should not need to know presentation details.
-
-### Task Execution
-
-Tasks represent executable steps needed to complete a job.
-
-Example gather job:
-
-1. reserve resource
-2. move to resource
-3. interact/gather
-4. acquire item
-5. determine delivery/storage destination
+1. reserve target
+2. move to target
+3. gather
+4. receive item
+5. find delivery destination
 6. move to destination
-7. deposit item
+7. deposit
 8. release reservations
 9. complete
 
-Jobs may initially use simple task sequences. Do not create a speculative general-purpose AI framework before real gameplay requires it.
+Do not build a speculative general AI framework before real gameplay requires it.
 
-### Reservation System
-
-Provides exclusive or capacity-based claims on shared world state.
-
-Initial reservation candidates:
-
-- resource nodes
-- loose items
-- jobs
-- storage destinations
-- construction requirements
-- interaction/work positions
-
-Reservations must release on success, cancellation, invalidation, failure, or villager destruction where applicable.
+### Reservations
+Reservations prevent conflicting claims on resources, jobs, loose items, storage capacity, work positions, and construction requirements. Claims must release on completion, cancellation, failure, invalidation, or villager removal.
 
 ### Navigation / Movement
+Keep path requests, path solving, movement execution, arrival detection, local avoidance, and animation separate. Avoid recalculating unchanged paths every frame.
 
-Navigation owns path/destination solving. Villager movement executes the result.
+The first movement implementation may be intentionally simple, but the API boundary must permit later scalable navigation without rewriting commands/jobs.
 
-Keep separate concepts for:
+### World / Resources
+The world owns terrain/traversability and resource-node runtime state. Resource definitions are shared data containing IDs, yield, gather requirements, visuals, depletion/renewal rules, and produced items where relevant.
 
-- destination requests
-- pathfinding
-- movement
-- arrival detection
-- local avoidance
-- animation
+### Items / Inventory / Storage
+Use one authoritative item definition layer and one compatible inventory model across villagers, storage, crafting, construction, and hauling.
 
-Avoid repeated path requests when the destination has not meaningfully changed.
+Storage exposes capacity/acceptance rules and reservable destinations.
 
-### Resource System
-
-Resource content should use shared definitions rather than type-specific scripts wherever practical.
-
-A resource definition may eventually include:
-
-- stable ID
-- display name
-- category
-- icon/visual references
-- gather time
-- required tool/skill
-- produced item
-- yield
-- respawn/depletion rules
-
-Runtime resource nodes own their world-specific state such as remaining quantity and reservation availability.
-
-### Item / Inventory System
-
-Item definitions describe item types. Runtime inventory state tracks quantities or item instances as appropriate.
-
-NPC carrying, storage, crafting, and construction should use the same authoritative item definitions.
-
-Do not introduce multiple incompatible inventory representations for different systems.
-
-### Storage System
-
-Storage accepts and exposes items according to capacity and allowed-item rules.
-
-Storage destinations should be reservable so several villagers cannot incorrectly target the same capacity.
-
-### Building / Construction
-
-Keep these concerns separate:
-
-- building definition
-- placement/validation
-- construction site state
-- required materials
-- worker interaction/progress
-- completed building behavior
-- visuals
-
-The completed building should not need to retain construction responsibilities unless explicitly required.
+### Buildings / Construction
+Keep building definition, placement/validation, construction-site state, resource requirements, worker progress, completed-building behavior, and visuals separate.
 
 ### Persistence
+Save data stores stable IDs and serializable gameplay state. It must not depend on Three.js meshes, scene graph references, DOM nodes, or transient runtime objects.
 
-Persistent systems should expose serializable state containing stable IDs and values rather than direct Unity object references.
+## Source Organization
 
-Save-system implementation is not required at the first movement milestone, but stable IDs and ownership rules should not make persistence impossible later.
-
-## Suggested Initial Code Organization
-
-Once the Unity project exists, prefer feature/system folders over one large Scripts directory. A possible starting structure is:
+Initial source boundaries:
 
 ```text
-Assets/
-  TheVillage/
-    Runtime/
-      Core/
-      Input/
-      Camera/
-      Selection/
-      Commands/
-      NPC/
-      Jobs/
-      Navigation/
-      Resources/
-      Items/
-      Inventory/
-      Storage/
-      Building/
-      Persistence/
-      UI/
-    Data/
-    Prefabs/
-    Scenes/
-    Art/
-    Audio/
-    Tests/
+src/
+  core/
+  input/
+  rendering/
+  world/
+  villagers/
+  selection/
+  commands/
+  jobs/
+  navigation/
+  resources/
+  items/
+  inventory/
+  storage/
+  building/
+  persistence/
+  ui/
+  data/
 ```
 
-This is an initial organization target, not permission to create empty architecture for systems that are not yet needed.
+Only create folders/systems when the current milestone needs them; do not fill the repository with empty speculative architecture.
 
 ## Dependency Direction
 
-Prefer dependencies that point toward shared abstractions/data rather than sideways through unrelated concrete systems.
-
-Example:
+Prefer:
 
 ```text
-UI/Input
-   ↓
-Command API
-   ↓
+UI / Input
+    ↓
+Selection / Command API
+    ↓
 Job System
-   ↓
+    ↓
 Task Execution
-   ↓
-Navigation / Resources / Inventory / Building
+    ↓
+Navigation / World / Resources / Inventory / Building
 ```
 
-NPC execution coordinates the current task but should not become the authoritative owner of global resource, storage, or building state.
+Rendering observes state and presents it. It should not become an alternate simulation layer.
 
 ## Performance Rules
 
-For villager-scaled systems:
+For mobile and larger settlements:
 
-- avoid one expensive Update loop per NPC where scheduled/ticked processing is sufficient
-- cache required references
-- avoid hierarchy searches during gameplay
-- avoid repeated allocations in hot paths
-- avoid unnecessary LINQ in simulation loops
+- centralize or schedule simulation work where appropriate
+- avoid expensive logic on every villager every animation frame
 - rate-limit autonomous job evaluation
-- avoid recomputing paths without cause
-- use pooling for high-churn objects when warranted
-- prefer event-driven state changes where practical
+- avoid repeated allocations in hot paths
+- spatially partition world queries when scale requires it
+- use instancing for repeated visual assets where practical
+- pool high-churn effects/objects when warranted
+- cap device pixel ratio/render cost where useful
+- avoid repeated pathfinding without cause
+- keep UI DOM updates event-driven
+- profile before complex optimization, while preserving scalable ownership from day one
 
-Optimize measured bottlenecks, but preserve scalable ownership from the beginning.
+## Build / Deployment Boundary
+
+Source code lives in the repository. Vite produces the deployable `dist/` build. Production should not rely on CDN import maps or editor-specific runtime files.
+
+`main` should remain buildable/playable once gameplay development begins. Build checks should run before changes are treated as stable.
 
 ## First Architectural Proof
 
-Before expanding the simulation, the project should demonstrate:
+Before expanding the simulation, verify:
 
-1. multiple villagers exist in one scene
-2. the player can select one or several
-3. a command is issued through a command API
-4. work is represented through the shared job/task path
-5. villagers navigate to a valid target
-6. interaction updates authoritative world state
-7. jobs and reservations clean up correctly
+1. browser build starts reliably
+2. test world renders on desktop/mobile browsers
+3. multiple villagers exist as persistent state plus separate visuals
+4. player can select one or more villagers
+5. command API issues a move order
+6. shared job/task path executes the order
+7. navigation/movement completes it
+8. interaction can change authoritative world state
+9. cancellation/failure releases reservations correctly
 
-If this loop is reliable, gathering, hauling, construction, and autonomous work can expand from the same foundation.
+Once this loop is trustworthy, gathering, hauling, storage, construction, and autonomous work can expand from the same foundation.
