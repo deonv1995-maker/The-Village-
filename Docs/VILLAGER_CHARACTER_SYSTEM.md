@@ -87,6 +87,9 @@ Outfit styles:
 - long dress
 - apron dress
 - child tunic
+- child dress
+
+Adult and child silhouettes use the same rig contract but may use different proportional profiles and clothing modules. Starter presets are examples only; hair, clothing, and palette choices remain independently swappable.
 
 The combination of body, hair, colors, and outfit is intended to create many visually distinct villagers without duplicating NPC logic.
 
@@ -96,7 +99,7 @@ The combination of body, hair, colors, and outfit is intended to create many vis
 : Stable body profiles, palette values, modular option IDs, and starter appearance presets.
 
 `src/rendering/villagers/VillagerAssetFactory.js`
-: Builds the articulated Three.js character, skeleton, modular mesh pieces, and cached rendering resources.
+: Builds the articulated Three.js character, skeleton, modular mesh pieces, face details, and cached rendering resources.
 
 `src/rendering/villagers/VillagerAnimationLibrary.js`
 : Owns reusable animation clips targeting the shared bone contract.

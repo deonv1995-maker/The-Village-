@@ -223,6 +223,11 @@ export class VillagerAssetFactory {
         this.addApron(bones.Hips, profile, materials.primary);
         this.addBelt(bones.Hips, profile, materials.primary);
         break;
+      case 'child_dress':
+        this.addSleeves(bones, profile, materials.primary, 0.48);
+        this.addSkirt(bones.Hips, profile, materials.primary, 0.36);
+        this.addBelt(bones.Hips, profile, materials.secondary);
+        break;
       case 'child_tunic':
         this.addSleeves(bones, profile, materials.primary, 0.48);
         this.addPants(bones, profile, materials.secondary, 0.92);
@@ -285,7 +290,7 @@ export class VillagerAssetFactory {
   }
 
   addFace(headBone, profile, materials) {
-    const eyeRadius = profile.headRadius * 0.105;
+    const eyeRadius = profile.headRadius * 0.115;
     const eyeGeometry = this.getGeometry(
       `eye:${stableNumber(eyeRadius)}`,
       () => new THREE.SphereGeometry(eyeRadius, 7, 5)
@@ -310,6 +315,29 @@ export class VillagerAssetFactory {
     nose.rotation.x = Math.PI * 0.5;
     nose.position.set(0, -profile.headRadius * 0.04, profile.headRadius * 0.98);
     headBone.add(nose);
+
+    const earGeometry = this.getGeometry(
+      `ear:${stableNumber(profile.headRadius)}`,
+      () => new THREE.SphereGeometry(profile.headRadius * 0.16, 7, 5)
+    );
+    for (const side of [-1, 1]) {
+      const ear = this.createMesh(earGeometry, materials.skin, false);
+      ear.scale.set(0.58, 0.88, 0.52);
+      ear.position.set(side * profile.headRadius * profile.headWidthScale * 0.98, -profile.headRadius * 0.02, 0);
+      headBone.add(ear);
+    }
+
+    const mouthGeometry = this.getGeometry(
+      `mouth:${stableNumber(profile.headRadius)}`,
+      () => new THREE.BoxGeometry(
+        profile.headRadius * 0.30,
+        profile.headRadius * 0.035,
+        profile.headRadius * 0.025
+      )
+    );
+    const mouth = this.createMesh(mouthGeometry, materials.eyes, false);
+    mouth.position.set(0, -profile.headRadius * 0.25, profile.headRadius * 0.955);
+    headBone.add(mouth);
   }
 
   createTorsoMesh(profile, material, scaleMultiplier) {
@@ -446,27 +474,37 @@ export class VillagerAssetFactory {
   }
 
   addApron(hipsBone, profile, material) {
-    const width = profile.hipWidth * 0.72;
-    const height = profile.upperLegLength * 0.62;
     const depth = Math.max(0.012, profile.torsoDepth * 0.055);
-    const geometry = this.getGeometry(
-      `apron:${stableNumber(width)}:${stableNumber(height)}:${stableNumber(depth)}`,
-      () => new THREE.BoxGeometry(width, height, depth)
+    const bibWidth = profile.shoulderWidth * 0.56;
+    const bibHeight = profile.torsoLength * 0.48;
+    const bibGeometry = this.getGeometry(
+      `apron-bib:${stableNumber(bibWidth)}:${stableNumber(bibHeight)}:${stableNumber(depth)}`,
+      () => new THREE.BoxGeometry(bibWidth, bibHeight, depth)
     );
-    const apron = this.createMesh(geometry, material);
-    apron.position.set(0, -height * 0.30, profile.torsoDepth * 0.55);
-    hipsBone.add(apron);
+    const bib = this.createMesh(bibGeometry, material);
+    bib.position.set(0, profile.torsoLength * 0.53, profile.torsoDepth * 0.535);
+    hipsBone.add(bib);
+
+    const skirtWidth = profile.hipWidth * 0.78;
+    const skirtHeight = profile.upperLegLength * 0.58;
+    const skirtGeometry = this.getGeometry(
+      `apron-skirt:${stableNumber(skirtWidth)}:${stableNumber(skirtHeight)}:${stableNumber(depth)}`,
+      () => new THREE.BoxGeometry(skirtWidth, skirtHeight, depth)
+    );
+    const skirtPanel = this.createMesh(skirtGeometry, material);
+    skirtPanel.position.set(0, -skirtHeight * 0.30, profile.torsoDepth * 0.555);
+    hipsBone.add(skirtPanel);
   }
 
   addHairSidePart(headBone, profile, material) {
     const radius = profile.headRadius;
     const geometry = this.getGeometry(
       `hair-side-part:${stableNumber(radius)}`,
-      () => new THREE.BoxGeometry(radius * 0.62, radius * 0.24, radius * 0.34)
+      () => new THREE.BoxGeometry(radius * 0.72, radius * 0.30, radius * 0.42)
     );
     const tuft = this.createMesh(geometry, material);
-    tuft.rotation.z = -0.22;
-    tuft.position.set(-radius * 0.24, radius * 0.80, radius * 0.14);
+    tuft.rotation.z = -0.24;
+    tuft.position.set(-radius * 0.22, radius * 0.87, radius * 0.20);
     headBone.add(tuft);
   }
 
@@ -474,7 +512,7 @@ export class VillagerAssetFactory {
     const radius = profile.headRadius;
     const geometry = this.getGeometry(
       `hair-spike:${stableNumber(radius)}`,
-      () => new THREE.ConeGeometry(radius * 0.16, radius * 0.46, 6)
+      () => new THREE.ConeGeometry(radius * 0.20, radius * 0.54, 6)
     );
     const offsets = [
       [-0.30, 0.92, 0.02, -0.24],
@@ -493,10 +531,10 @@ export class VillagerAssetFactory {
     const radius = profile.headRadius;
     const geometry = this.getGeometry(
       `hair-bun:${stableNumber(radius)}`,
-      () => new THREE.SphereGeometry(radius * 0.42, 9, 7)
+      () => new THREE.SphereGeometry(radius * 0.48, 9, 7)
     );
     const bun = this.createMesh(geometry, material);
-    bun.position.set(0, radius * 0.35, -radius * 0.90);
+    bun.position.set(0, radius * 0.42, -radius * 0.88);
     headBone.add(bun);
   }
 
@@ -510,9 +548,9 @@ export class VillagerAssetFactory {
       const bead = this.createMesh(beadGeometry, material);
       bead.scale.set(0.86, 1.18, 0.80);
       bead.position.set(
-        radius * 0.34,
-        -radius * (0.18 + index * 0.32),
-        -radius * 0.82
+        radius * 0.62,
+        -radius * (0.06 + index * 0.34),
+        -radius * 0.24
       );
       headBone.add(bead);
     }
@@ -522,11 +560,11 @@ export class VillagerAssetFactory {
     const radius = profile.headRadius;
     const geometry = this.getGeometry(
       `hair-shoulder:${stableNumber(radius)}`,
-      () => new THREE.BoxGeometry(radius * 0.34, radius * 1.15, radius * 0.30)
+      () => new THREE.BoxGeometry(radius * 0.42, radius * 1.28, radius * 0.34)
     );
     for (const side of [-1, 1]) {
       const panel = this.createMesh(geometry, material);
-      panel.position.set(side * radius * 0.74, -radius * 0.34, -radius * 0.12);
+      panel.position.set(side * radius * 0.70, -radius * 0.38, radius * 0.04);
       panel.rotation.z = side * -0.07;
       headBone.add(panel);
     }
