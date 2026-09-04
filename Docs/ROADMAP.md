@@ -36,11 +36,14 @@ Exit condition: the player can reliably inspect the playable test area on deskto
 
 ## Phase 2 — Villager Representation
 
-- [ ] Create minimal villager state model
-- [ ] Give villagers stable IDs
-- [ ] Create separate villager rendering representation
-- [ ] Place multiple villagers in the test world
-- [ ] Keep gameplay state independent of Three.js meshes
+- [x] Create minimal villager state model
+- [x] Give villagers stable IDs
+- [x] Create separate villager rendering representation
+- [x] Place multiple villagers in the test world
+- [x] Keep gameplay state independent of Three.js meshes
+- [x] Add six reusable villager body profiles on one shared articulated rig
+- [x] Add modular hair, clothing, skin, and palette data
+- [x] Add shared idle/walk animation clips
 
 Do not add full needs, relationships, aging, combat, or occupations yet.
 
